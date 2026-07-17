@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://lead-qualification-agent-1-1ihs.onrender.com/api/:path*"
+    }
+  ]
+}
