@@ -37,6 +37,8 @@ export default function Dashboard() {
     notes: '',
   })
   const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [submitSuccess, setSubmitSuccess] = useState<string | null>(null)
 
   useEffect(() => {
     loadAnalytics()
@@ -54,12 +56,23 @@ export default function Dashboard() {
   async function handleSubmitLead(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
+    setSubmitError(null)
+    setSubmitSuccess(null)
     try {
-      await api.submitLead(newLead)
-      setShowNewLead(false)
+      const result = await api.submitLead(newLead)
+      setSubmitSuccess(
+        `Lead submitted! Classification: ${result.classification ?? 'Processing…'}, Score: ${result.score ?? 'N/A'}`
+      )
       setNewLead({ name: '', email: '', company: '', role: '', source: '', notes: '' })
       await loadAnalytics()
-    } catch (e) {
+      // Auto-close modal after 2 seconds on success
+      setTimeout(() => {
+        setShowNewLead(false)
+        setSubmitSuccess(null)
+      }, 2000)
+    } catch (e: any) {
+      const msg = e?.message ?? 'Unknown error. Please check the backend is running.'
+      setSubmitError(msg)
       console.error('Failed to submit lead:', e)
     } finally {
       setSubmitting(false)
@@ -157,6 +170,16 @@ export default function Dashboard() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg mx-4 p-6">
             <h2 className="text-lg font-semibold mb-4">Submit New Lead</h2>
+            {submitError && (
+              <div className="mb-3 px-3 py-2 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                <strong>Error:</strong> {submitError}
+              </div>
+            )}
+            {submitSuccess && (
+              <div className="mb-3 px-3 py-2 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700">
+                {submitSuccess}
+              </div>
+            )}
             <form onSubmit={handleSubmitLead} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <input
@@ -207,7 +230,7 @@ export default function Dashboard() {
               <div className="flex justify-end gap-2 pt-2">
                 <button
                   type="button"
-                  onClick={() => setShowNewLead(false)}
+                  onClick={() => { setShowNewLead(false); setSubmitError(null); setSubmitSuccess(null) }}
                   className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg"
                 >
                   Cancel

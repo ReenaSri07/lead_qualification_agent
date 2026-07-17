@@ -41,7 +41,7 @@ app.include_router(router, prefix="/api/v1", tags=["Leads"])
 async def startup_event():
     """Initialize the database on application startup."""
     init_db()
-    print(f"✅ {settings.APP_NAME} v{settings.APP_VERSION} initialized")
+    print(f"[OK] {settings.APP_NAME} v{settings.APP_VERSION} initialized")
     print(f"   Database: {settings.DATABASE_URL}")
     print(f"   LLM Model: {settings.LLM_MODEL}")
 

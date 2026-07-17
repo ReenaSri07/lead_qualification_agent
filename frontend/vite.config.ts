@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://leadqualificationagent-production.up.railway.app',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },
